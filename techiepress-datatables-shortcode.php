@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: techiepress datatables shortcode
  * Plugin URI: https://github.com/yttechiepress/techiepress-datatables-shortcode
