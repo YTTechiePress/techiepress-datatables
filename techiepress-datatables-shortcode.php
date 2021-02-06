@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Plugin Name: techiepress datatables shortcode
- * Plugin URI: https://github.com/yttechiepress/techiepress-datatables
+ * Plugin URI: https://github.com/yttechiepress/techiepress-datatables-shortcode
  * Author: Techiepress
- * Author URI: https://github.com/yttechiepress/techiepress-datatables
+ * Author URI: https://github.com/yttechiepress/techiepress-datatables-shortcode
  * Description: This plugin adds a shortcode Datatables embed on pages in WordPress
  * Version: 0.1.0
  * License: GPL2 or later.
@@ -45,7 +44,20 @@ function techiepress_enqueue_scripts( $hook ) {
         return;
     }
 
-        /**
+    wp_enqueue_style( 'dtsh_css', plugin_dir_url( __FILE__ ) . 'assets/css/jquery.dataTables.min.css', array(), '1.0.0', 'all' );
+    wp_enqueue_script( 'dtsh_js', plugin_dir_url( __FILE__ ) . 'assets/js/jquery.dataTables.min.js', array( 'jquery' ), '1.0.0', true );
+    wp_enqueue_script( 'dtsh_js_init', plugin_dir_url( __FILE__ ) . 'assets/js/init-tables.js', array( 'dtsh_js' ), '1.0.0', true );
+
+}
+
+/**
+ * Add table to admin area.
+ *
+ * @return void
+ */
+function techiepress_dtsh_show_page() {
+
+    /**
      * Add a call to the API provider to store the info in the WP_options table.
      */
 
@@ -69,45 +81,47 @@ function techiepress_enqueue_scripts( $hook ) {
         return;
     }
 
-    $data = json_decode($data_option);
+    $data = json_decode( $data_option );
 
-    $multiobject = array();
+    // var_dump($data);
 
-    $count = 0;
-    foreach($data as $dataline) {
-        $count++;
-
-        if ( $count < 11 ) {
-            $multiitem = array(
-                'district_code' => $dataline->district_code,
-                'district_name' => $dataline->district_name,
-            );
-    
-            array_push( $multiobject, $multiitem );
-        }
-        
-    }
-
-    wp_enqueue_script( 'dtsh_js', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js', array( 'jquery' ), '1.0.0', true );
-    wp_enqueue_script( 'dtsh_js_init', plugin_dir_url( __FILE__ ) . 'assets/js/init-tables.js', array( 'dtsh_js' ), '1.0.0', true );
-
-    wp_localize_script( 'dtsh_js_init', 'techie_data', array(
-        'data' => $multiobject,
-    ) );
-
-}
-
-/**
- * Add table to admin area.
- *
- * @return void
- */
-function techiepress_dtsh_show_page() {
 
     ?>
         <div class="wrap">
             <h1 class="wp-heading-inline">Datatables Javascript in WordPress</h1>
-            <canvas id="myChart" width="400" height="400" style="max-width:500px; max-height:500px;"></canvas>
+
+            <table id="techiepress-datatables-shortcode" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>district code</th>
+                        <th>district name</th>
+                        <th>region code</th>
+                        <th>region name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <?php
+                            foreach( $data as $data_line ) {
+                                echo '<tr>';
+                                echo '<td>' . $data_line->district_code . '</td>';
+                                echo '<td>' . $data_line->district_name . '</td>';
+                                echo '<td>' . $data_line->region_code . '</td>';
+                                echo '<td>' . $data_line->region_name . '</td>';
+                                echo '</tr>';
+                            }
+                        ?>
+                </tbody>
+                <!-- <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Office</th>
+                        <th>Age</th>
+                        <th>Start date</th>
+                        <th>Salary</th>
+                    </tr>
+                </tfoot> -->
+            </table>
         </div>
     <?php
 }
